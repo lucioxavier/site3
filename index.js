@@ -22,17 +22,19 @@ app.post('/cadastro', async (req, res) => {
   try {
     await db.query('INSERT INTO usuarios (usuario, senha) VALUES ($1, $2)', [usuario, senha]);
 
-    // Envia o e-mail de confirmação
-    enviarEmailConfirmacao(usuario, usuario); // aqui, usuário é o e-mail
-
-    res.redirect('/login.html');
+    res.redirect('/login.html'); // <-- redireciona primeiro
   } catch (err) {
-    if (err.code === '23505') { // usuário já existe
-      res.send('Usuário já existe. <a href="/cadastro.html">Tentar novamente</a>');
+    console.error('Erro ao cadastrar:', err);
+
+    if (err.code === '23505') {
+      return res.send('Usuário já existe. <a href="/cadastro.html">Tentar novamente</a>');
     } else {
-      res.send('Erro ao cadastrar. <a href="/cadastro.html">Tentar novamente</a>');
+      return res.send('Erro ao cadastrar. <a href="/cadastro.html">Tentar novamente</a>');
     }
   }
+
+  // Tenta enviar o e-mail mesmo que a resposta já tenha sido dada
+  enviarEmailConfirmacao(usuario, usuario);
 });
 
 // ROTA DE LOGIN
