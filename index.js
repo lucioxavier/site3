@@ -42,6 +42,23 @@ app.post('/login', (req, res) => {
   });
 });
 
+app.get('/admin', (req, res) => {
+  const sql = 'SELECT id, usuario FROM usuarios';
+
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      res.send('Erro ao listar usuários.');
+    } else {
+      let html = '<h2>Usuários cadastrados:</h2><ul>';
+      rows.forEach(user => {
+        html += `<li>ID: ${user.id} | Usuário: ${user.usuario}</li>`;
+      });
+      html += '</ul><a href="/">Voltar</a>';
+      res.send(html);
+    }
+  });
+});
+
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
