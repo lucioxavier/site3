@@ -41,7 +41,8 @@ app.post('/login', (req, res) => {
     if (err) {
       res.send('Erro no login. <a href="/login.html">Tentar novamente</a>');
     } else if (row) {
-      res.redirect('/home.html');
+      req.session.usuario = row.usuario; // cria a sessão
+      res.redirect('/home');
     } else {
       res.send('Login inválido. <a href="/login.html">Tentar novamente</a>');
     }
@@ -105,9 +106,21 @@ app.post('/admin-login', (req, res) => {
   }
 });
 
+const path = require('path');
+
+app.get('/home', (req, res) => {
+  if (!req.session.usuario) {
+    return res.redirect('/login.html');
+  }
+
+  res.sendFile(path.join(__dirname, 'home.html'));
+});
+
 app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/admin-login.html');
+  req.session.destroy(err => {
+    if (err) return res.send('Erro ao sair.');
+    res.redirect('/login.html'); // ou /admin-login.html dependendo de quem saiu
+  });
 });
 
 app.listen(port, () => {
