@@ -21,6 +21,10 @@ app.post('/cadastro', async (req, res) => {
 
   try {
     await db.query('INSERT INTO usuarios (usuario, senha) VALUES ($1, $2)', [usuario, senha]);
+
+    // Envia o e-mail de confirmação
+    enviarEmailConfirmacao(usuario, usuario); // aqui, usuário é o e-mail
+
     res.redirect('/login.html');
   } catch (err) {
     if (err.code === '23505') { // usuário já existe
