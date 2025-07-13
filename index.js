@@ -51,10 +51,32 @@ app.get('/admin', (req, res) => {
     } else {
       let html = '<h2>Usuários cadastrados:</h2><ul>';
       rows.forEach(user => {
-        html += `<li>ID: ${user.id} | Usuário: ${user.usuario}</li>`;
+        html += `
+          <li>
+            ID: ${user.id} | Usuário: ${user.usuario}
+            <a href="/deletar?id=${user.id}" onclick="return confirm('Tem certeza que deseja excluir este usuário?')">❌ Excluir</a>
+          </li>`;
       });
       html += '</ul><a href="/">Voltar</a>';
       res.send(html);
+    }
+  });
+});
+
+app.get('/deletar', (req, res) => {
+  const id = req.query.id;
+
+  if (!id) {
+    return res.send('ID inválido.');
+  }
+
+  const sql = 'DELETE FROM usuarios WHERE id = ?';
+
+  db.run(sql, [id], function(err) {
+    if (err) {
+      res.send('Erro ao excluir usuário.');
+    } else {
+      res.redirect('/admin');
     }
   });
 });
